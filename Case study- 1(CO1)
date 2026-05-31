@@ -1,0 +1,32 @@
+public class AVLTree {
+  static class Node { int key, height; Node left, right; Node(int k){key=k;height=1;} }
+  Node root;
+  int height(Node n){ return n==null?0:n.height; }
+  int bf(Node n){ return n==null?0:height(n.left)-height(n.right); }
+  void updH(Node n){ n.height=1+Math.max(height(n.left),height(n.right)); }
+
+  Node rotR(Node y){ Node x=y.left; y.left=x.right; x.right=y; updH(y); updH(x); return x; }
+  Node rotL(Node x){ Node y=x.right; x.right=y.left; y.left=x; updH(x); updH(y); return y; }
+
+  Node insert(Node n, int k){
+    if(n==null) return new Node(k);
+    if(k<n.key) n.left=insert(n.left,k);
+    else if(k>n.key) n.right=insert(n.right,k);
+    else return n;
+    updH(n); int b=bf(n);
+    if(b>1  && k<n.left.key)  return rotR(n);         // LL
+    if(b<-1 && k>n.right.key) return rotL(n);         // RR
+    if(b>1  && k>n.left.key){n.left=rotL(n.left);  return rotR(n);} // LR
+    if(b<-1 && k<n.right.key){n.right=rotR(n.right);return rotL(n);}// RL
+    return n;
+  }
+  void insert(int k){ root=insert(root,k); }
+  void inOrder(Node n){if(n==null)return;inOrder(n.left);System.out.print(n.key+" ");inOrder(n.right);}
+
+  public static void main(String[] a){
+    AVLTree t=new AVLTree();
+    for(int k:new int[]{10,20,30,40,50,60,70}) t.insert(k);
+    t.inOrder(t.root); // Output: 10 20 30 40 50 60 70
+    System.out.println("Root: "+t.root.key); // Root: 40
+  }
+}
